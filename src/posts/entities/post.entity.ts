@@ -10,7 +10,7 @@ export class Post {
     user: User;
 
     @Column()
-    ulr: string;
+    url: string;
 
     @Column()
     description: string;
