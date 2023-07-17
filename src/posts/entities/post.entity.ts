@@ -13,6 +13,9 @@ export class Post {
     url: string;
 
     @Column()
+    hashtags: string;
+
+    @Column()
     description: string;
 
     @Column()

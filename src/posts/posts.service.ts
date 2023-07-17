@@ -18,6 +18,7 @@ export class PostsService {
   ) {}
 
   create(createPostDto: CreatePostDto, user: any) {
+    createPostDto.hashtags = this.addHashBeforeWords(createPostDto.hashtags);
     const post = this.postsRepository.create({...createPostDto, user});
     return this.postsRepository.save(post);
   }
@@ -49,5 +50,11 @@ export class PostsService {
   async revokeLike(id: string, req: any) {
     await this.likesService.delete(req.user, {id});
     return this.postsRepository.decrement({id}, 'likeCounter', 1);
+  }
+
+  addHashBeforeWords(str: string): string {
+    const words: string[] = str.split(" ");
+    const result: string = "#" + words.join(" #");
+    return result;
   }
 }
