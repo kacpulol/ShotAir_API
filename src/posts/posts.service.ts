@@ -30,14 +30,24 @@ export class PostsService {
     return this.postsRepository.findOneBy({id});
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto) {
-    const post = await this.findOne(id);
-    return this.postsRepository.save({...post, ...updatePostDto});
+  findOneByIdRelation(id: string) {
+    return this.postsRepository.findOne({relations: ['user'], where: {id}});
   }
 
-  async remove(id: string) {
-    const post = await this.findOne(id);
+  async update(id: string, updatePostDto: UpdatePostDto, user: any) {
+    const post = await this.findOneByIdRelation(id);
+    if (post.user.id == user.id) {
+    return this.postsRepository.save({...post, ...updatePostDto})
+    }
+    throw new ConflictException('You are not the owner of this post');
+  }
+
+  async remove(id: string, user: any) {
+    const post = await this.findOneByIdRelation(id);
+    if (post.user.id == user.id) {
     return this.postsRepository.remove(post);
+    }
+    throw new ConflictException('You are not the owner of this post');
   }
 
   async like(id: string, req: any) {
