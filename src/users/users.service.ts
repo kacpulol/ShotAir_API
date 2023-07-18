@@ -18,8 +18,9 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  findAll() {
-    return this.usersRepository.find();
+  async findAll() {
+    const users = await this.usersRepository.find();
+    return users.map(({password, salt, ...user}) => user);
   }
 
   findOne(id: string) {

@@ -14,8 +14,8 @@ export class AuthService {
 
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.usersService.findOneByUsername(username);
-
-    if (user && user.password === password) {
+    const saltedPassword = this.saltAndHash(password, user.salt);
+    if (user && user.password === saltedPassword) {
       const { password, username, ...result } = user;
       return result;
     }
@@ -23,7 +23,7 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
+  async logIn(user: any) {
     const payload = {
       username: user.username,
       userId: user.id,
@@ -62,13 +62,17 @@ export class AuthService {
     }; //TOOD: secure against data injection in body
     if (!this.validatePassword(user.password))
       throw new ConflictException(
-        'Password does not contain a number or a special character',
+        'Password must contain: letter, number and a special character.',
       );
+      if (await this.usersService.findOneByUsername(user.username))
+        throw new ConflictException(
+          'This username is already in use. Please choose another one.',
+        );
     user.salt = randomBytes(16).toString('hex');
     user.password = this.saltAndHash(user.password, user.salt);
     const insertRntity = { ...user };
     const createResult = await this.usersService.create(insertRntity);
     const { password, salt, ...result } = createResult;
-    return this.login(result);
+    return this.logIn(result);
   }
 }
