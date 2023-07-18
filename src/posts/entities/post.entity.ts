@@ -3,21 +3,21 @@ import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Post {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @ManyToOne(() => User, (user) => user.id)
-    user: User;
+  @ManyToOne(() => User, (user) => user.id)
+  user: User;
 
-    @Column()
-    url: string;
+  @Column()
+  url: string;
 
-    @Column()
-    hashtags: string;
+  @Column()
+  hashtags: string;
 
-    @Column()
-    description: string;
+  @Column()
+  description: string;
 
-    @Column()
-    likeCounter?: number;
+  @Column()
+  likeCounter?: number;
 }

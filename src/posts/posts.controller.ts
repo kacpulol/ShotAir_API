@@ -1,9 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Request, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Request,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { CreateLikeDto } from 'src/likes/dto/create-like.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -11,19 +20,19 @@ export class PostsController {
 
   @UseGuards(JwtAuthGuard)
   @Post('like/:id')
-  likePost(@Param('id') id: string,  @Request() req: any) {
+  likePost(@Param('id') id: string, @Request() req: any) {
     return this.postsService.like(id, req.user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('unlike/:id')
-  unLikePost(@Param('id') id: string,  @Request() req: any) {
+  unLikePost(@Param('id') id: string, @Request() req: any) {
     return this.postsService.revokeLike(id, req.user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createPostDto: CreatePostDto,  @Request() req: any){
+  create(@Body() createPostDto: CreatePostDto, @Request() req: any) {
     return this.postsService.create(createPostDto, req.user);
   }
 
@@ -39,14 +48,17 @@ export class PostsController {
 
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto, @Request() req: any) {
+  update(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+    @Request() req: any,
+  ) {
     return this.postsService.update(id, updatePostDto, req.user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id') id: string,  @Request() req: any) {
+  remove(@Param('id') id: string, @Request() req: any) {
     return this.postsService.remove(id, req.user);
   }
-
 }

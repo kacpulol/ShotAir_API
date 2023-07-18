@@ -8,36 +8,35 @@ import { LikesService } from 'src/likes/likes.service';
 
 @Injectable()
 export class PostsService {
-
   constructor(
     @InjectRepository(Post)
     private postsRepository: Repository<Post>,
 
-    private likesService: LikesService
+    private likesService: LikesService,
   ) {}
 
   create(createPostDto: CreatePostDto, user: any) {
     createPostDto.hashtags = this.addHashBeforeWords(createPostDto.hashtags);
-    const post = this.postsRepository.create({...createPostDto, user});
+    const post = this.postsRepository.create({ ...createPostDto, user });
     return this.postsRepository.save(post);
   }
 
   findAll() {
-    return this.postsRepository.find({relations: ['user']});
+    return this.postsRepository.find({ relations: ['user'] });
   }
 
   findOne(id: string) {
-    return this.postsRepository.findOneBy({id});
+    return this.postsRepository.findOneBy({ id });
   }
 
   findOneByIdRelation(id: string) {
-    return this.postsRepository.findOne({relations: ['user'], where: {id}});
+    return this.postsRepository.findOne({ relations: ['user'], where: { id } });
   }
 
   async update(id: string, updatePostDto: UpdatePostDto, user: any) {
     const post = await this.findOneByIdRelation(id);
     if (post.user.id == user.id) {
-    return this.postsRepository.save({...post, ...updatePostDto})
+      return this.postsRepository.save({ ...post, ...updatePostDto });
     }
     throw new ConflictException('You are not the owner of this post');
   }
@@ -45,25 +44,24 @@ export class PostsService {
   async remove(id: string, user: any) {
     const post = await this.findOneByIdRelation(id);
     if (post.user.id == user.id) {
-    return this.postsRepository.remove(post);
+      return this.postsRepository.remove(post);
     }
     throw new ConflictException('You are not the owner of this post');
   }
 
   async like(id: string, req: any) {
-    
-    await this.likesService.create(req.user, {id});
-    return this.postsRepository.increment({id}, 'likeCounter', 1);
+    await this.likesService.create(req.user, { id });
+    return this.postsRepository.increment({ id }, 'likeCounter', 1);
   }
-  
+
   async revokeLike(id: string, req: any) {
     await this.likesService.delete(req.id, id);
-    return this.postsRepository.decrement({id}, 'likeCounter', 1);
+    return this.postsRepository.decrement({ id }, 'likeCounter', 1);
   }
 
   addHashBeforeWords(str: string): string {
-    const words: string[] = str.split(" ");
-    const result: string = "#" + words.join(" #");
+    const words: string[] = str.split(' ');
+    const result: string = '#' + words.join(' #');
     return result;
   }
 }
