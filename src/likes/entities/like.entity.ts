@@ -8,7 +8,7 @@ export class Like {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @OneToMany(() => User, (user) => user.id)
+    @ManyToOne(() => User, (user) => user.id)
     user: User;
 
     @ManyToOne(() => Post, (post) => post.id)

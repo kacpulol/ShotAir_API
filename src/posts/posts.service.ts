@@ -5,7 +5,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
 import { LikesService } from 'src/likes/likes.service';
-import { CreateLikeDto } from 'src/likes/dto/create-like.dto';
 
 @Injectable()
 export class PostsService {
@@ -48,7 +47,7 @@ export class PostsService {
   }
   
   async revokeLike(id: string, req: any) {
-    await this.likesService.delete(req.user, {id});
+    await this.likesService.delete(req.id, id);
     return this.postsRepository.decrement({id}, 'likeCounter', 1);
   }
 
