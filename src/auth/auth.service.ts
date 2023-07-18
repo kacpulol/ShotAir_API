@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  NotFoundException,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { SignInValidator } from './dto/auth-signin.dto';
@@ -13,14 +17,16 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.usersService.findOneByUsername(username);
-    const saltedPassword = this.saltAndHash(password, user.salt);
-    if (user && user.password === saltedPassword) {
-      const { password, username, ...result } = user;
-      return result;
+    try {
+      const user = await this.usersService.findOneByUsername(username);
+      const saltedPassword = this.saltAndHash(password, user.salt);
+      if (user && user.password === saltedPassword) {
+        const { password, username, ...result } = user;
+        return result;
+      }
+    } catch (err) {
+      throw new NotFoundException('User not found.');
     }
-
-    return null;
   }
 
   async logIn(user: any) {
@@ -64,10 +70,10 @@ export class AuthService {
       throw new ConflictException(
         'Password must contain: letter, number and a special character.',
       );
-      if (await this.usersService.findOneByUsername(user.username))
-        throw new ConflictException(
-          'This username is already in use. Please choose another one.',
-        );
+    if (await this.usersService.findOneByUsername(user.username))
+      throw new ConflictException(
+        'This username is already in use. Please choose another one.',
+      );
     user.salt = randomBytes(16).toString('hex');
     user.password = this.saltAndHash(user.password, user.salt);
     const insertRntity = { ...user };
